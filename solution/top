@@ -1,9 +1,36 @@
 #! /bin/bash
 
-# run the script like this:
-# $ chmod +x ./path/to/top
-# $ ./path/to/top 10 ./path/to/log.txt
+txt=$(awk '{print $4}' $2 | cut -d: -f1 | sort | uniq -c | sort -nr | head -$1 | tr -d "[]")
 
-# here comes your solution
-# e.g.
-cut -d' ' -f1 $2 | head -$1 | cat -n
+temp_num=1
+for i in $txt	
+do 
+	if [ $temp_num -eq 1 ]; then
+		let "total+=i"
+		temp_num=0
+	else
+		temp_num=1
+	fi
+done
+
+count=1
+for i in $txt		
+do 
+	if [ $temp_num -eq 1 ]; then
+		temp_num=$i
+	else
+		temp_txt+="$count. "
+		bar=$(echo $i | sed 's/\// /g')
+		temp_txt+="$(printf "$bar" | date +%Y-%m-%d -f-)"
+		temp_txt+=" - $temp_num - $(printf %.1f $(echo "scale=3; $temp_num*100/$total" | bc))%"
+
+		echo $temp_txt
+		((count+=1))
+		temp_num=1
+		temp_txt=""
+	fi
+done
+
+    
+
+    
